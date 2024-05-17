@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+{{subject}}
+{{compare}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Descriptor</title>
+    <script defer src="static/face-api.min.js"></script>
+    <script defer src="static/sup.js"></script>
+</head>
+<body>
+
+    <div>
+        <video id="video" width="250" height="250" autoplay muted></video>
+        <canvas id="overlay" width="250" height="250"></canvas>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Enter Name:</label>
+        <input type="text" id="name" name="name" readonly>
+
+        <label for="descriptor">Descriptor Data:</label>
+        <input type="text" id="HDdata" name="descriptor" readonly>
+
+        <label for="subject">subject:</label>
+        <input type="text" id="subject" name="subject" readonly>
+
+        <script>
+            nameChange = document.getElementById('name')
+            subjectChange = document.getElementById('subject')
+            nameChange.value = "{{user}}"
+            subjectChange.value = "{{subject}}"
+            // if {{compare}} == True:
+            //     document.body.append("you have been marked attended")
+            // else:
+            //     document.body.append("you have been marked absent")
+        </script>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if name %}
+        <p>The number for {{ name }} is: {{ number }}</p>
+    {% endif %}
+
+    <!-- Refresh button -->
+    <button onclick="refreshPage()">Refresh Page</button>
+
+    <script>
+        // Function to refresh the page
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student List</title>
+</head>
+<body>
+    <h1>Student List</h1>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.username }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

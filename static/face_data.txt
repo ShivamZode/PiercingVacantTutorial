@@ -1,0 +1,42 @@
+Convert an object into a JSON object:
+{{object|json_script:id}}  ---:> do not add thisb in the script tag of the html file
+EX-- {{bands|json_script: "band-json"}}
+
+home.views---
+def index(request):   
+    contex = {"bands" : list(Band.objects.values())}
+    return render(request , 'index.html', contex)
+
+import json
+import math
+
+def euclidean_distance(descriptor1, descriptor2):
+    sum_sq = 0
+    for key in descriptor1.keys():
+        sum_sq += (descriptor1[key] - descriptor2.get(key, 0)) ** 2
+    return math.sqrt(sum_sq)
+
+def compare_face_descriptors(descriptor1, descriptor2):
+    # Deserialize JSON strings to dictionaries
+    descriptor1 = json.loads(descriptor1)
+    descriptor2 = json.loads(descriptor2)
+
+    # Compute Euclidean distance between the descriptors
+    distance = euclidean_distance(descriptor1, descriptor2)
+
+    # Define a threshold for similarity
+    threshold = 0.5  # Adjust as needed
+
+    # Check if the distance is below the threshold
+    if distance < threshold:
+        return True  # The faces are considered similar
+    else:
+        return False  # The faces are considered dissimilar
+
+# Example usage
+descriptor1 = '{"0":-0.1341283917427063,"1":0.08146066963672638,"2":0.02545163221657276,"3":-0.004102917388081551,"4":-0.004002573434263468,"5":-0.06256917864084244,"6":0.075804039835}'
+descriptor2 = '{"0":-0.1341283917427063,"1":0.08146066963672638,"2":0.02545163221657276,"3":-0.004102917388081551,"4":-0.004002573434263468,"5":-0.06256917864084244,"6":0.075804039835}'
+result = compare_face_descriptors(descriptor1, descriptor2)
+print("Faces are similar:", result)
+
+

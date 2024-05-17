@@ -1,0 +1,119 @@
+const videoElement = document.getElementById('video');
+videoElement.setAttribute('autoplay', true);
+//document.body.append(videoElement);
+
+// const extractedFacesContainer = document.createElement('div');
+// document.body.append(extractedFacesContainer);
+
+// dont put
+// const nameInput = document.createElement('input');
+// nameInput.setAttribute('type', 'text');
+// nameInput.setAttribute('placeholder', 'Enter your name');
+// document.body.append(nameInput);
+
+// const submitButton = document.createElement('button');
+// submitButton.textContent = 'Submit';
+// document.body.append(submitButton);
+
+//put
+let isFaceDetected = false;
+let resizedDetections; 
+
+Promise.all([
+  faceapi.nets.faceRecognitionNet.loadFromUri('static/models'),
+  faceapi.nets.faceLandmark68Net.loadFromUri('static/models'),
+  faceapi.nets.ssdMobilenetv1.loadFromUri('static/models')
+]).then(startVideo);
+
+async function startVideo() {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  videoElement.srcObject = stream;
+
+  videoElement.addEventListener('play', async () => {
+    const canvas = faceapi.createCanvasFromMedia(videoElement);
+    document.body.append(canvas);
+    const displaySize = { width: videoElement.width, height: videoElement.height };
+    faceapi.matchDimensions(canvas, displaySize);
+
+    const interval = setInterval(async () => {
+      if (!isFaceDetected) {
+        const detections = await faceapi.detectAllFaces(videoElement).withFaceLandmarks().withFaceDescriptors();
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+        if (resizedDetections.length > 0) {
+          isFaceDetected = true;
+          // const faceCanvas = document.createElement('canvas');
+          const face = resizedDetections[0];
+          const { x, y, width, height } = face.detection.box;
+          // faceCanvas.width = 0;
+          // faceCanvas.height = 0;
+          // const ctx = faceCanvas.getContext('2d');
+          // ctx.drawImage(videoElement, x, y, width, height, 0, 0, width, height);
+          // extractedFacesContainer.append(faceCanvas);
+
+          // Fill face descriptor
+          const faceDescriptorTextarea = document.getElementById('faceDescriptor');
+          faceDescriptorTextarea.value = JSON.stringify(face.descriptor);
+
+          // Fill face landmarks
+          const faceLandmarksTextarea = document.getElementById('faceLandmarks');
+          faceLandmarksTextarea.value = JSON.stringify(face.landmarks);
+
+          // Stop extracting face
+          clearInterval(interval);
+        }
+      }
+
+      // Clear canvas
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw detected faces
+      // faceapi.draw.drawDetections(canvas, resizedDetections);
+      // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    }, 200);
+  });
+ }
+
+// submitButton.addEventListener('click', () => {
+//   const name = nameInput.value.trim();
+//   if (name && isFaceDetected) {
+//     const faceCanvas = extractedFacesContainer.querySelector('canvas');
+//     const dataURL = faceCanvas.toDataURL('image/png');
+//     saveFaceImage(name, dataURL);
+//   } else {
+//     alert('Please enter your name and wait for your face to be detected.');
+//   }
+// });
+
+// function saveFaceImage(name, dataURL) {
+//   const blob = dataURLtoBlob(dataURL);
+//   const formData = new FormData();
+//   formData.append('name', name);
+//   formData.append('image', blob, `${name}.png`);
+
+//   fetch('/template/save_face_image.php', {
+//     method: 'POST',
+//     body: formData
+//   })
+//   .then(response => {
+//     if (!response.ok) {
+//       throw new Error('Failed to save face image.');
+//     }
+//     alert('Face image saved successfully!');
+//   })
+//   .catch(error => {
+//     console.error(error);
+//     alert('Failed to save face image. Please try again.');
+//   });
+// }
+
+// function dataURLtoBlob(dataURL) {
+//   const byteString = atob(dataURL.split(',')[1]);
+//   const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+//   const arrayBuffer = new ArrayBuffer(byteString.length);
+//   const uint8Array = new Uint8Array(arrayBuffer);
+//   for (let i = 0; i < byteString.length; i++) {
+//     uint8Array[i] = byteString.charCodeAt(i);
+//   }
+//   return new Blob([arrayBuffer], { type: mimeString });
+// }
