@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+  <div id="qrcode"></div>
+
+  <script>
+    // Create QR code
+    var qrCode = new QRCode(document.getElementById("qrcode"), {
+      text: "Hello, world!", // Data to encode
+      width: 200,
+      height: 200,
+    });
+  </script>
+</body>
+</html>

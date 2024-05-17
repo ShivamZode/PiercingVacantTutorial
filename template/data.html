@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student List</title>
+  <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    h3 {
+      /* text-align: center; */
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #student-table {
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .tabulator-header {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .tabulator-header .tabulator-col {
+      border-right: 1px solid #fff;
+    }
+    .tabulator-header .tabulator-col:last-child {
+      border-right: none;
+    }
+    .tabulator-table {
+      border-collapse: collapse;
+      overflow-x: auto;
+    }
+    .tabulator-table .tabulator-row {
+      background-color: #fff;
+      border-bottom: 1px solid #f4f4f4;
+    }
+    .tabulator-table .tabulator-row:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .tabulator-table .tabulator-cell {
+      padding: 10px;
+    }
+  </style>
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+</head>
+<body>
+  
+  <h1>Student Attendance Record</h1>
+  
+  <div id="student-table"></div>
+  <div>
+    <h3>subject : {{subject}} </h3> <h3>Date : {{date}}</h3>
+
+  </div>
+
+  <script>
+    var studentData = {{ student_usernames_with_status|safe }};
+
+    var table = new Tabulator("#student-table", {
+      data: studentData,
+      layout: "fitColumns",
+      columns: [
+        {title: "Username", field: "username"},
+        {title: "Status", field: "status"}
+      ]
+    });
+  </script>
+</body>
+</html>

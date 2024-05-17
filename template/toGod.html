@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script defer src="static/face-api.min.js"></script>
+  <script defer src="static/yo.js"></script>
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <title>Face Recognition</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> 
+</head>
+<body>
+  <div>
+    <div id="scanningMessage" style="display: none;">Face scanning...</div>
+    <video id="video" width="400" height="400" autoplay muted style = "margin-top : 40px"></video>
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </div>
+
+  <div id="formDiv">
+    <form method="post" action="/ajax">
+      {% csrf_token %}
+      <div data-mdb-input-init class="form-outline mb-4 py-4">
+        <input type="username" id="form1Example1" name="name" class="form-control" readonly/>
+        <label class="form-label" for="form1Example1">Username</label>
+      </div>
+      <div class="form-outline mb-100 py-100">
+        <label for="faceDescriptor">Face Descriptor:</label>
+        <textarea id="faceDescriptor" rows="1" cols="1" name="face_descriptor" readonly></textarea>
+      </div>
+      <div>
+        <button data-mdb-ripple-init type="submit" class="btn btn-primary btn-block">Submit</button>
+      </div>
+    </form>
+  </div>
+
+ <!-- Added for displaying scanning message -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  <script>
+     const descElement = document.getElementById('form1Example1')
+     descElement.value = "{{user}}"
+  </script>
+
+  <script>
+    // JavaScript for face scanning
+    async function startVideo() {
+      const videoElement = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const messageElement = document.getElementById('scanningMessage');
+     
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoElement.srcObject = stream;
+      const displaySize = { width: videoElement.width, height: videoElement.height };
+      faceapi.matchDimensions(canvas, displaySize);
+       
+
+      videoElement.addEventListener('play', async () => {
+        const interval = setInterval(async () => {
+          const detections = await faceapi.detectAllFaces(videoElement).withFaceLandmarks().withFaceDescriptors();
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+          if (resizedDetections.length > 0) {
+            const face = resizedDetections[0];
+            const faceDescriptorTextarea = document.getElementById('faceDescriptor');
+            faceDescriptorTextarea.value = JSON.stringify(face.descriptor);
+            clearInterval(interval);
+            messageElement.innerText = "Face scanning completed.";
+            messageElement.style.display = "block"; // Show the message element
+          }
+
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        }, 200);
+      });
+    }
+
+    // Call the function to start face scanning
+    startVideo();
+  </script>
+</body>
+</html>
+
+  <script>
+     const descElement = document.getElementById('form1Example1')
+     descElement.value = "{{user}}"
+  </script>
+
+  <script>
+    // JavaScript for face scanning
+    async function startVideo() {
+      const videoElement = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const messageElement = document.getElementById('scanningMessage');
+     
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoElement.srcObject = stream;
+      const displaySize = { width: videoElement.width, height: videoElement.height };
+      faceapi.matchDimensions(canvas, displaySize);
+       
+
+      videoElement.addEventListener('play', async () => {
+        const interval = setInterval(async () => {
+          const detections = await faceapi.detectAllFaces(videoElement).withFaceLandmarks().withFaceDescriptors();
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+          if (resizedDetections.length > 0) {
+            const face = resizedDetections[0];
+            const faceDescriptorTextarea = document.getElementById('faceDescriptor');
+            faceDescriptorTextarea.value = JSON.stringify(face.descriptor);
+            clearInterval(interval);
+            messageElement.innerText = "Face scanning completed.";
+            messageElement.style.display = "block"; // Show the message element
+          }
+
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        }, 200);
+      });
+    }
+
+    // Call the function to start face scanning
+    startVideo();
+  </script>
+</body>
+</html>

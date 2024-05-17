@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Descriptor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        video {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hidden-form {
+            display: none;
+        }
+
+        button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        .message {
+            text-align: center;
+            color: #ff6347;
+            margin-top: 20px;
+        }
+    </style>
+    <script defer src="static/face-api.min.js"></script>
+    <script defer src="static/sup.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Scanning....</h2>
+        <div class="video-container">
+            <video id="video" width="400" height="400" autoplay muted></video>
+        </div>
+        
+        <form id="faceForm" method="post" class="hidden-form">
+            {% csrf_token %}
+            <input type="hidden" id="name" name="name" readonly>
+            <input type="hidden" id="HDdata" name="descriptor" readonly>
+            <input type="hidden" id="subject" name="subject" readonly>
+            <script>
+                nameChange = document.getElementById('name')
+                subjectChange = document.getElementById('subject')
+                nameChange.value = "{{user}}"
+                subjectChange.value = "{{subject}}"
+            </script>
+        </form>
+
+        <form id="faceForm1" action="/presenty" method="post" class="hidden-form">
+            {% csrf_token %}
+            <input type="hidden" id="name1" name="name" readonly>
+            <input type="hidden" id="subject1" name="subject" readonly>
+            <script>
+                nameChange1 = document.getElementById('name1')
+                subjectChange1 = document.getElementById('subject1')
+                nameChange1.value = "{{user}}"
+                subjectChange1.value = "{{subject}}"
+                if ("{{compare}}" === "True" && subjectChange.value == "{{subject}}") {
+                    document.getElementById('faceForm1').submit();
+                } else {
+                    document.querySelector('.container').insertAdjacentHTML('beforeend', '<p class="message">Please Put your Face Inside The Box</p>');
+                }
+            </script>
+        </form>
+
+        <button onclick="refreshPage()">Refresh Page</button>
+    </div>
+
+    <script>
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

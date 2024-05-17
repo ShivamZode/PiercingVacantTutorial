@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Descriptor Extraction</title>
+    <!-- Load FaceAPI.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay muted></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+
+    <script>
+        // Load models
+        Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri('static/models'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('static/models'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('static/models'),
+            faceapi.nets.faceExpressionNet.loadFromUri('static/models')
+        ]).then(startVideo);
+
+        async function startVideo() {
+            // Access webcam stream
+            const video = document.getElementById('video');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+            video.srcObject = stream;
+
+            // Detect faces in real-time
+            video.addEventListener('play', () => {
+                const canvas = faceapi.createCanvasFromMedia(video);
+                document.body.append(canvas);
+                const displaySize = { width: video.width, height: video.height };
+                faceapi.matchDimensions(canvas, displaySize);
+
+                setInterval(async () => {
+                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                    faceapi.draw.drawDetections(canvas, resizedDetections);
+                    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+                    resizedDetections.forEach(detection => {
+                        const descriptor = detection.descriptor;
+                        console.log(descriptor);
+                        // You can use descriptor data here as needed
+                    });
+                }, 100); // Adjust interval as needed
+            });
+        }
+    </script>
+</body>
+</html>
